@@ -1,15 +1,20 @@
-// const INPUT: &str = include_str!("input.txt");
-const INPUT: &str = "two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen";
+const INPUT: &str = include_str!("input.txt");
 
 fn main() {
     let sum = INPUT
         .lines()
+        .map(|line| {
+            line.replace("zero", "zero0zero")
+                .replace("one", "one1one")
+                .replace("two", "two2two")
+                .replace("three", "three3three")
+                .replace("four", "four4four")
+                .replace("five", "five5five")
+                .replace("six", "six6six")
+                .replace("seven", "seven7seven")
+                .replace("eight", "eight8eight")
+                .replace("nine", "nine9nine")
+        })
         .map(|line| line.chars().filter(|c| c.is_digit(10)).collect::<String>())
         .map(|mut num_str| {
             if num_str.len() > 2 {
