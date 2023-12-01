@@ -1,33 +1,63 @@
 const INPUT: &str = include_str!("input.txt");
 
+const NUMBER_STRINGS: [&str; 9] = [
+    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+];
+
+fn get_last_digit(line: &str) -> u32 {
+    for index in 0..line.len() {
+        let substring = &line[..line.len() - index];
+        if let Some(number) = substring
+            .chars()
+            .last()
+            .expect("line ended without a digit")
+            .to_digit(10)
+        {
+            return number;
+        }
+
+        if let Some((index, _)) = NUMBER_STRINGS
+            .iter()
+            .enumerate()
+            .filter(|(_, &number_string)| substring.ends_with(number_string))
+            .nth(0)
+        {
+            return (index + 1) as u32;
+        }
+    }
+
+    unreachable!("No digit in line");
+}
+
+fn get_first_digit(line: &str) -> u32 {
+    for index in 0..line.len() {
+        let substring = &line[index..];
+        if let Some(number) = substring
+            .chars()
+            .next()
+            .expect("line ended without a digit")
+            .to_digit(10)
+        {
+            return number;
+        }
+
+        if let Some((index, _)) = NUMBER_STRINGS
+            .iter()
+            .enumerate()
+            .filter(|(_, &number_string)| substring.starts_with(number_string))
+            .nth(0)
+        {
+            return (index + 1) as u32;
+        }
+    }
+
+    unreachable!("No digit in line");
+}
+
 fn main() {
     let sum = INPUT
         .lines()
-        .map(|line| {
-            line.replace("zero", "zero0zero")
-                .replace("one", "one1one")
-                .replace("two", "two2two")
-                .replace("three", "three3three")
-                .replace("four", "four4four")
-                .replace("five", "five5five")
-                .replace("six", "six6six")
-                .replace("seven", "seven7seven")
-                .replace("eight", "eight8eight")
-                .replace("nine", "nine9nine")
-        })
-        .map(|line| line.chars().filter(|c| c.is_digit(10)).collect::<String>())
-        .map(|mut num_str| {
-            if num_str.len() > 2 {
-                num_str.drain(1..num_str.len() - 1);
-                num_str
-            } else if num_str.len() == 1 {
-                num_str.repeat(2)
-            } else {
-                num_str
-            }
-        })
-        .inspect(|num_str| eprintln!("{}", num_str))
-        .map(|num_str| num_str.parse::<u32>().unwrap())
+        .map(|line| get_first_digit(line) * 10 + get_last_digit(line))
         .sum::<u32>();
 
     dbg!(sum);
