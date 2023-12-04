@@ -62,12 +62,12 @@ impl TryFrom<&str> for Schematic {
                             })
                         }
                     }
-                    '*' | '=' | '/' | '@' | '&' | '-' | '+' | '%' | '#' | '$' => {
+                    '*' => {
                         symbols.push(Character { at: y * width + x });
 
                         finish_number();
                     }
-                    _ => unreachable!("character doesnt exist in input: {character}"),
+                    _ => {}
                 }
             }
         }
@@ -81,25 +81,41 @@ impl TryFrom<&str> for Schematic {
 }
 
 impl Schematic {
-    fn sum_part_numbers(&self) -> u64 {
+    fn sum_gear_ratios(&self) -> u64 {
         let indices_around = |index: usize| -> [usize; 8] {
-            [index - 1 - self.width, index - self.width, index + 1 - self.width,
-            index - 1, index + 1,
-            index - 1 + self.width, index + self.width, index + 1 + self.width]
+            [
+                index - 1 - self.width,
+                index - self.width,
+                index + 1 - self.width,
+                index - 1,
+                index + 1,
+                index - 1 + self.width,
+                index + self.width,
+                index + 1 + self.width,
+            ]
         };
 
         self.symbols
             .iter()
-            .flat_map(|symbol| self.numbers.iter().filter(|&number| {
+            .filter_map(|symbol| {
                 let indices = indices_around(symbol.at);
+                let adjacent_numbers = self.numbers.iter().filter(|number| {
+                    indices
+                        .iter()
+                        .any(|&index| index >= number.from && index <= number.to)
+                }).collect::<Vec<_>>();
 
-                indices.iter().any(|&index| index >= number.from && index <= number.to)
-            }).map(|number| number.value))
-        .sum::<u64>()
+                if adjacent_numbers.len() == 2 {
+                    Some(adjacent_numbers.iter().map(|n| n.value).product::<u64>())
+                } else {
+                    None
+                }
+            })
+            .sum::<u64>()
     }
 }
 
 fn main() {
     let schematic = Schematic::try_from(INPUT).expect("input couldnt be parsed");
-    dbg!(schematic.sum_part_numbers());
+    dbg!(schematic.sum_gear_ratios());
 }
