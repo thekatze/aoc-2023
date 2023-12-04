@@ -35,25 +35,31 @@ impl TryFrom<&str> for ScratchCard {
 }
 
 impl ScratchCard {
-    fn get_winning_numbers_count(&self) -> u32 {
+    fn get_winning_numbers_count(&self) -> u64 {
         self.numbers
             .iter()
             .filter(|&n| self.winning_numbers.contains(n))
-            .count() as u32
+            .count() as u64
     }
 }
 
 fn main() {
-    let sum = INPUT
+    let winning_amounts = INPUT
         .lines()
         .map(|line| {
             ScratchCard::try_from(line)
                 .expect("input invalid")
                 .get_winning_numbers_count()
         })
-        .filter(|&count| count > 0)
-        .map(|count| 2_u64.pow(count - 1))
-        .sum::<u64>();
+        .collect::<Vec<_>>();
 
-    dbg!(sum);
+    let mut won_cards = Vec::<u64>::with_capacity(winning_amounts.len());
+
+    for card in winning_amounts.iter().rev() {
+        let card_value = won_cards.iter().rev().take(*card as usize).sum::<u64>();
+        won_cards.push(card_value + 1);
+    }
+
+    let amount_cards = won_cards.iter().sum::<u64>();
+    dbg!(amount_cards);
 }
