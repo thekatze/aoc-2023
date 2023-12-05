@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 const INPUT: &str = include_str!("input.txt");
 
 #[derive(Debug)]
@@ -65,7 +67,12 @@ fn main() {
     let (_, seeds) = seeds.split_once(": ").expect("format");
     let seeds = seeds
         .split_whitespace()
-        .map(|seed| seed.parse::<u64>().expect("seed to be a number"));
+        .collect::<Vec<_>>()
+        .chunks(2)
+        .flat_map(|chunk| {
+            let (from, count) = (chunk[0].parse::<u64>().unwrap(), chunk[1].parse::<u64>().unwrap());
+            from..from + count
+        }).collect::<Vec<_>>();
 
     let maps = maps
         .split("\n\n")
@@ -73,7 +80,8 @@ fn main() {
         .collect::<Vec<_>>();
 
     let min = seeds
-        .map(|seed| {
+        .par_iter()
+        .map(|&seed| {
             maps.iter().fold(seed, |seed, current_map| {
                 let mappings = &current_map.mappings;
                 mappings
