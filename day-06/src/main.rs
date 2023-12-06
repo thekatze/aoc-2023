@@ -3,8 +3,8 @@ const INPUT: &str = include_str!("input.txt");
 // Distance:  9  40  200";
 
 struct Race {
-    time: u32,
-    record: u32,
+    time: u64,
+    record: u64,
 }
 
 impl Race {
@@ -28,19 +28,16 @@ fn main() {
             let (_, numbers) = line.split_once(":").expect("invalid input");
             numbers
                 .split_whitespace()
-                .map(|number| number.trim().parse::<u32>().expect("invalid input"))
-                .collect::<Vec<_>>()
+                .collect::<String>()
+                .parse::<u64>()
+                .expect("invalid input")
         })
         .collect::<Vec<_>>();
 
-    let times = parsed.get(0).expect("invalid input");
-    let records = parsed.get(1).expect("invalid input");
+    let time = *parsed.get(0).expect("invalid input");
+    let record = *parsed.get(1).expect("invalid input");
 
-    let result = times
-        .iter()
-        .zip(records.iter())
-        .map(|(&time, &record)| Race { time, record }.count_record_time_configurations())
-        .product::<u32>();
+    let result = Race { time, record }.count_record_time_configurations();
 
     dbg!(result);
 }
