@@ -44,9 +44,13 @@ impl Hand {
                 counts[*current as usize] += 1;
                 counts
             });
+
+        let jokers = counts[Card::J as usize];
+        counts[Card::J as usize] = 0;
+
         counts.sort_by(|a, b| b.cmp(a));
 
-        match (counts[0], counts[1]) {
+        match (counts[0] + jokers, counts[1]) {
             (5, _) => Hand::FiveOfAKind,
             (4, _) => Hand::FourOfAKind,
             (3, 2) => Hand::FullHouse,
@@ -88,6 +92,7 @@ impl Cards {}
 mod card {
     #[derive(Clone, Copy, Debug, PartialOrd, Ord, PartialEq, Eq)]
     pub enum Card {
+        J,
         Two,
         Three,
         Four,
@@ -97,7 +102,6 @@ mod card {
         Eight,
         Nine,
         T,
-        J,
         Q,
         K,
         A,
@@ -108,6 +112,7 @@ mod card {
 
         fn try_from(value: char) -> Result<Self, Self::Error> {
             match value {
+                'J' => Ok(Card::J),
                 '2' => Ok(Card::Two),
                 '3' => Ok(Card::Three),
                 '4' => Ok(Card::Four),
@@ -117,7 +122,6 @@ mod card {
                 '8' => Ok(Card::Eight),
                 '9' => Ok(Card::Nine),
                 'T' => Ok(Card::T),
-                'J' => Ok(Card::J),
                 'Q' => Ok(Card::Q),
                 'K' => Ok(Card::K),
                 'A' => Ok(Card::A),
