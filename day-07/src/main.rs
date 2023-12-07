@@ -75,10 +75,9 @@ impl TryFrom<&str> for Game {
         let bid = bid.parse().map_err(|_| "bid not a number")?;
 
         let cards: [Card; 5] = cards.try_into().map_err(|_| "not five cards")?;
-        let hand = Hand::from_cards(&cards);
 
         Ok(Game {
-            cards: Cards(hand, cards),
+            cards: cards.into(),
             bid,
         })
     }
@@ -87,7 +86,11 @@ impl TryFrom<&str> for Game {
 #[derive(Clone, Copy, Debug, PartialOrd, Ord, PartialEq, Eq)]
 struct Cards(Hand, [Card; 5]);
 
-impl Cards {}
+impl From<[Card; 5]> for Cards {
+    fn from(value: [Card; 5]) -> Self {
+        Cards(Hand::from_cards(&value), value)
+    }
+}
 
 mod card {
     #[derive(Clone, Copy, Debug, PartialOrd, Ord, PartialEq, Eq)]
