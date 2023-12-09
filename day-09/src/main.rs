@@ -1,19 +1,16 @@
-// const INPUT: &str = include_str!("input.txt");
-const INPUT: &str = "0 3 6 9 12 15
-1 3 6 10 15 21
-10 13 16 21 30 45
-";
+const INPUT: &str = include_str!("input.txt");
 
 #[derive(Debug, Clone)]
 struct Sequence(Vec<i32>);
 
 impl Sequence {
     fn get_next_number(self) -> i32 {
-        let derivatives = self.get_all_derivatives();
+        let mut derivatives = self.get_all_derivatives();
+        derivatives.reverse();
 
-        let prediction = derivatives.iter().fold(0, |prediction, derivative| {
-            let last_number = derivative.0.last().expect("list empty, thats no good");
-            prediction + last_number
+        let prediction = derivatives.iter().skip(1).fold(0, |prediction, derivative| {
+            let first_number = derivative.0.first().expect("list empty, thats no good");
+            first_number - prediction
         });
 
         prediction
@@ -48,7 +45,7 @@ impl Sequence {
 }
 
 fn main() {
-    let sum_of_next_numbers = INPUT
+    let sum_of_prev_numbers = INPUT
         .lines()
         .map(|line| {
             Sequence(
@@ -60,5 +57,5 @@ fn main() {
         })
         .sum::<i32>();
 
-    dbg!(sum_of_next_numbers);
+    dbg!(sum_of_prev_numbers);
 }
