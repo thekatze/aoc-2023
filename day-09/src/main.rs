@@ -8,10 +8,13 @@ impl Sequence {
         let mut derivatives = self.get_all_derivatives();
         derivatives.reverse();
 
-        let prediction = derivatives.iter().skip(1).fold(0, |prediction, derivative| {
-            let first_number = derivative.0.first().expect("list empty, thats no good");
-            first_number - prediction
-        });
+        let prediction = derivatives
+            .iter()
+            .skip(1)
+            .fold(0, |prediction, derivative| {
+                let first_number = derivative.0.first().expect("list empty, thats no good");
+                first_number - prediction
+            });
 
         prediction
     }
